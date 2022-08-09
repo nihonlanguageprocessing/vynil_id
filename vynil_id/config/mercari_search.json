@@ -1,0 +1,77 @@
+{
+    "params": {
+        "userId": "",
+        "pageSize": 10,
+        "pageToken": "",
+        "searchSessionId": "a016bec735ea9288ef9410a08ebc6e07",
+        "indexRouting": "INDEX_ROUTING_UNSPECIFIED",
+        "thumbnailTypes": [],
+        "searchCondition": {
+            "keyword": "",
+            "excludeKeyword": "",
+            "sort": "SORT_SCORE",
+            "order": "ORDER_DESC",
+            "status": [
+                "STATUS_ON_SALE"
+            ],
+            "sizeId": [],
+            "categoryId": [
+                1161
+            ],
+            "brandId": [],
+            "sellerId": [],
+            "priceMin": 0,
+            "priceMax": 0,
+            "itemConditionId": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "shippingPayerId": [],
+            "shippingFromArea": [],
+            "shippingMethod": [],
+            "colorId": [],
+            "hasCoupon": false,
+            "attributes": [],
+            "itemTypes": [],
+            "skuIds": []
+        },
+        "defaultDatasets": [],
+        "serviceFrom": "suruga"
+    },
+    "headers_search": {
+        "authority": "api.mercari.jp",
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "en-US,en;q=0.9,ja-JP;q=0.8,ja;q=0.7,de;q=0.6",
+        "cache-control": "no-cache",
+        "dpop": "eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiT2pqUWMxYWpYYlhrc2NtaVpkNUhVVTVaSGd0bzBlRXNDUjl0Q2RLcDA3WSIsInkiOiJuNHlTcmwya3JjdmpoUDdUazNZbzhubW53N29sd3hyTnE1aDQxZUswMnBvIn19.eyJpYXQiOjE2NTk2MTgzNjIsImp0aSI6IjkwOTZlYWJmLTg1ZDUtNDU5My1hMTVlLWZiNTI4NzNlMTU2ZSIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvdjIvZW50aXRpZXM6c2VhcmNoIiwiaHRtIjoiUE9TVCIsInV1aWQiOiI3YTFjMjUxMy0xNTk3LTRkNzAtODExNC02NWZmYjZiNjY3OWMifQ.Obgs0vQGox-e_v449ueHDYH3IenZVBawyZ9zAFGo9NOhVFdLAkLzrBl11CcFC8Ps64peffWTzUZb6-tHqOO3DA",
+        "origin": "https://jp.mercari.com",
+        "pragma": "no-cache",
+        "referer": "https://jp.mercari.com/",
+        "sec-ch-ua": "\".Not/A)Brand\";v=\"99\", \"Google Chrome\";v=\"103\", \"Chromium\";v=\"103\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "cross-site",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36",
+        "x-platform": "web"
+    },
+    "headers_description": {
+      "authority": "api.mercari.jp",
+      "accept": "application/json, text/plain, */*",
+      "accept-language": "en-US,en;q=0.9,ja;q=0.8",
+      "dpop": "eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiYnpyNHQ2aV9nVFpodzlBR085NV9hUmpDMU9IYzY3bHFweG91LWtqSVBKWSIsInkiOiJxZUlQVkVDVFpEZmRTeExOM1Q4LXNBc0RHRWNqaWFuOEJySl9RbTducXZjIn19.eyJpYXQiOjE2NTk3NzY3MDksImp0aSI6ImVkYzNjZThiLTQ1NDEtNDM1MS1hYTU3LWQ4YzcwOWRjY2UwNCIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvaXRlbXMvZ2V0IiwiaHRtIjoiR0VUIiwidXVpZCI6IjIyMWQ4MTUyLTg0ZTMtNDczOC1hOWRhLWQzMzYwNzgzYTViMCJ9.jvc3gHB7AqAEmnajy-HO-d8xncJ7DrN_-qQKeFeTEo6dpx2yFAzxdn-AdVZ8mU9xH0D-ycgEVCkwZ4Vr5HHSkA",
+      "origin": "https://jp.mercari.com",
+      "referer": "https://jp.mercari.com/",
+      "sec-ch-ua": "\" Not;A Brand\";v=\"99\", \"Microsoft Edge\";v=\"103\", \"Chromium\";v=\"103\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"Windows\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "cross-site",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77",
+      "x-platform": "web"
+  }
+}
