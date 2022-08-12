@@ -1,0 +1,62 @@
+import json
+from urllib import request, response
+from urllib.parse import parse_qsl
+from urllib.parse import urlparse
+import requests
+from PIL import Image
+from io import BytesIO
+import discogs_client
+
+
+
+
+DISCOGS_RELEASE_URL = 'https://api.discogs.com/releases/'
+# Enter your user token to get images
+d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="")
+
+
+def get_discogs_cover_image(discogs_id):
+    """Function returning the cover image of the album"""
+    # Change the 0 to get other images associated with the album
+    cover = d.release(discogs_id).images[0]
+    cover_url = list(cover.values())[1]
+    response = requests.get(cover_url)
+    cover_img = Image.open(BytesIO(response.content))
+    return cover_img
+
+def get_discogs_artist_name(discogs_id):
+    """Function returning artist name for the album"""
+    params = {'id':discogs_id}
+    
+    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
+    json_data = response.json()
+    artist_name = json_data['artists'][0]['name']
+    return artist_name
+
+def get_discogs_album_name(discogs_id):
+    """Function returning the name of the album"""
+    params = {'id':discogs_id}
+    
+    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
+    json_data = response.json()
+    album_name = json_data['title']
+    return album_name
+
+def get_discogs_url(discogs_id):
+    """Function returning the url for the album"""
+    params = {'id':discogs_id}
+    
+    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
+    json_data = response.json()
+    album_url = json_data['uri']
+    return album_url
+
+def get_discogs_lowest_price(discogs_id):
+    """Function returning the lowest price on discogs in $"""
+    params = {'id':discogs_id}
+    
+    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
+    json_data = response.json()
+    lowest_price = json_data['lowest_price']
+    return lowest_price
+
