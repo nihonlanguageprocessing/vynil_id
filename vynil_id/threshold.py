@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from utils.geo_tools import *
 from utils.cv2_tools import *
+import os
 
 
 def get_quads(contours, method='oct'):
@@ -28,9 +29,7 @@ def get_quads(contours, method='oct'):
             quads.append(quad)
     return quads
 
-
-if __name__ == '__main__':
-    image = cv2.imread('raw_data/mercari_images/test3.jpg')
+def threshold(image):
     #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     contours = get_contours(image)
     hulls = get_hulls(contours)
@@ -42,3 +41,12 @@ if __name__ == '__main__':
     plt.figure(figsize=(8,8))
     plt.imshow(image)
     plt.show()
+
+if __name__ == '__main__':
+    directory = 'raw_data/mercari_images'
+    for filename in os.listdir(directory):
+       f = os.path.join(directory, filename)
+    # checking if it is a file
+       if os.path.isfile(f):
+           image = cv2.imread(f)
+           threshold(image)
