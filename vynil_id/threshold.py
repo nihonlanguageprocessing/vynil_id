@@ -36,8 +36,9 @@ if __name__ == '__main__':
     hulls = get_hulls(contours)
 
     quads = get_quads(contours = hulls, method = 'red')
-    #print('hello')
+    quads = squarish(quads)
     cv2.drawContours(image,quads,-1,(0,255,255),5)
+
     plt.figure(figsize=(8,8))
     plt.imshow(image)
     plt.show()

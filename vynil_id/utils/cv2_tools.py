@@ -49,6 +49,21 @@ def clahe(image, clip_limit=2.0, grid_size=(8,8)):
     clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=grid_size)
     return clahe.apply(image)
 
+def squarish(contours):
+    '''returns squarish contours'''
+    squarish_contours = []
+    for contour in contours:
+        dists = point_distances(contour)
+        avg_length = np.average(dists)
+        diff = np.sum(np.abs(dists - avg_length))
+        ratio = diff / sum(dists)
+        if  ratio <= 0.075:
+            print(ratio)
+            squarish_contours.append(contour)
+
+    return squarish_contours
+
+
 
 def filter(image):
     pass
