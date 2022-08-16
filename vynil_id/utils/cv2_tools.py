@@ -57,8 +57,8 @@ def squarish(contours):
         avg_length = np.average(dists)
         diff = np.sum(np.abs(dists - avg_length))
         ratio = diff / sum(dists)
+
         if  ratio <= 0.075:
-            print(ratio)
             squarish_contours.append(contour)
 
     return squarish_contours
