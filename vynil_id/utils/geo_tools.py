@@ -41,6 +41,16 @@ def max_directional_oct(contour):
 
     return oct_point
 
+def orient_quad(quad):
+    '''returns a 4-point quadrilateral with the 0th index being the top left item'''
+    x, y = np.split(quad,2,axis=1)
+
+    top_2_x_index = np.argsort(x,axis=0)[-2:]
+    top_y_index = int(top_2_x_index[np.argmin(y[top_2_x_index])])
+    oriented_quad = np.concatenate((quad[top_y_index:],quad[:top_y_index]), axis=0)
+
+    return oriented_quad
+
 def point_distances(points):
     '''get distances between sequential points
     Points should be ordered either counter or clockwise'''

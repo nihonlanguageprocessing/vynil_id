@@ -63,7 +63,39 @@ def squarish(contours):
 
     return squarish_contours
 
+def unwarp(image, contour):
+    '''unwarps an image based on quadrilateral contours'''
+    h, w = image.shape[:2]
+    # use cv2.getPerspectiveTransform() to get M, the transform matrix, and Minv, the inverse
+    size = int(500)
+    source = orient_quad(contour.squeeze(axis=1).astype(np.float32))
 
+
+    dest = np.float32([(size, 0),
+                  (size, size),
+                  (0, size),
+                  (0, 0)])
+
+
+
+    M = cv2.getPerspectiveTransform(source, dest)
+    # use cv2.warpPerspective() to warp your image to a top-down view
+    warped = cv2.warpPerspective(image, M, (w, h), flags=cv2.INTER_LINEAR)
+    crop_warped = warped[0:size, 0:size].copy()
+    print(w-size)
+    print(w)
+    testing = True
+    if testing:
+        f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+        f.subplots_adjust(hspace=.2, wspace=.05)
+        ax1.imshow(image)
+
+        ax1.set_title('Original Image', fontsize=30)
+        ax2.imshow(cv2.flip(crop_warped, 1))
+        ax2.set_title('Unwarped Image', fontsize=30)
+        plt.show()
+    else:
+        return warped, M
 
 def filter(image):
     pass

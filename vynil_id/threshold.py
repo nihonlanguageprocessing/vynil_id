@@ -29,18 +29,29 @@ def get_quads(contours, method='oct'):
             quads.append(quad)
     return quads
 
-def threshold(image):
+
+def threshold(image, verbose = False, show_candidates = False):
     #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     contours = get_contours(image)
     hulls = get_hulls(contours)
 
     quads = get_quads(contours = hulls, method = 'red')
     quads = squarish(quads)
-    cv2.drawContours(image,quads,-1,(0,255,255),5)
 
-    plt.figure(figsize=(8,8))
-    plt.imshow(image)
-    plt.show()
+    candidates = []
+    for quad in quads:
+        candidate = unwarp(image, quad)
+        candidates.append(candidate)
+        print('hello')
+
+
+    if verbose==True:
+        cv2.drawContours(image,quads,-1,(0,255,255),5)
+        plt.figure(figsize=(8,8))
+        plt.imshow(image)
+        plt.show()
+
+    pass
 
 if __name__ == '__main__':
     directory = 'raw_data/mercari_images'
@@ -49,4 +60,4 @@ if __name__ == '__main__':
     # checking if it is a file
        if os.path.isfile(f):
            image = cv2.imread(f)
-           threshold(image)
+           threshold(image, verbose=True)

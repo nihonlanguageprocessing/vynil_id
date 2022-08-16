@@ -56,7 +56,8 @@ class Listing:
         return f'https://www.mercari.com/jp/items/{self.id}'
 
 
-def get_mercari_listings(json_data, get_desc=False):
+def get_mercari_listings(json_data
+                         , get_desc=False):
     '''Parses search result JSON data and returns a list of listings'''
     listings = []
     for listing in json_data:
@@ -97,13 +98,20 @@ def get_mercari_item_description(mercari_id):
     return description
 
 
-def get_mercari_search_results(url, headers, json_params, items=10):
+def get_mercari_search_results(url=MERCARI_SEARCH_URL
+                               , headers=HEADERS
+                               , json_params=JSON_PARAMS
+                               , items=10
+                               , save=False):
     """Uses the mercariAPI to get search results based on saved parameters"""
     json_params['pageSize'] = items
     response = requests.post(url=url, headers=headers, json=json_params)
     json_data = json.loads(response.text)['items']
-    with open('vynil_id/config/mercari_search_results.json', 'w') as json_file:
-        json.dump(json_data, json_file, indent=4, ensure_ascii=False)
+
+    if save == True:
+        with open('vynil_id/config/mercari_search_results.json', 'w') as json_file:
+            json.dump(json_data, json_file, indent=4, ensure_ascii=False)
+
     return json_data
 
 
