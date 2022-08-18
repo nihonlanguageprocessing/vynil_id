@@ -9,11 +9,11 @@ import re
 import discogs_client
 
 
-TEST
+TEST_LABEL_ID = '728017' ##acid wax
 
 DISCOGS_RELEASE_URL = 'https://api.discogs.com/releases/'
 # Enter your user token to get images
-d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="")
+d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="puQrtnEjrKmMyUteBXrItifKdglTROLzMCGGfbem")
 
 def get_discogs_cover_image(discogs_id):
     """Function returning the cover image of the album"""
@@ -25,7 +25,9 @@ def get_discogs_cover_image(discogs_id):
         cover_url = list(cover.values())[1]
         response = requests.get(cover_url)
         cover_img = Image.open(BytesIO(response.content))
+
         return cover_img
+    pass
 
 def get_discogs_artist_name(discogs_id):
     """Function returning artist name for the album"""
@@ -96,10 +98,16 @@ def get_release_id_from_labels(discogs_label_id):
 
     return release_id_from_label
 
-def get_discogs_album_covers_from_label(discogs_label_id):
+def get_discogs_album_covers_from_label(discogs_label_id, save = False):
     ids = get_release_id_from_labels(discogs_label_id)
     # returns the images from the label discogs has a request limit of 60 per minute
+
     for id in ids:
-        get_discogs_cover_image(id)
+        image = get_discogs_cover_image(id)
+        print(image)
+        if save == True and image:
+            image.save('raw_data/discogs_images/'+ id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
+
 
 if __name__ == '__main__':
+    get_discogs_album_covers_from_label(TEST_LABEL_ID, save=True)
