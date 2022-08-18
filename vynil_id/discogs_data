@@ -15,15 +15,17 @@ DISCOGS_RELEASE_URL = 'https://api.discogs.com/releases/'
 # Enter your user token to get images
 d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="")
 
-
 def get_discogs_cover_image(discogs_id):
     """Function returning the cover image of the album"""
     # Change the 0 to get other images associated with the album
-    cover = d.release(discogs_id).images[0]
-    cover_url = list(cover.values())[1]
-    response = requests.get(cover_url)
-    cover_img = Image.open(BytesIO(response.content))
-    return cover_img
+    
+    #returns the images of albums that have an image associated with it
+    if d.release(discogs_id).images is not None:
+        cover = d.release(discogs_id).images[0]
+        cover_url = list(cover.values())[1]
+        response = requests.get(cover_url)
+        cover_img = Image.open(BytesIO(response.content))
+        return cover_img
 
 def get_discogs_artist_name(discogs_id):
     """Function returning artist name for the album"""
@@ -69,7 +71,7 @@ def get_release_id_from_labels(discogs_label_id):
     page_number = len(d.label(discogs_label_id).releases)/50
     
     label_results = {}
-    for i in range(int(page_number/50)+2):
+    for i in range(int(page_number)+2):
         label = d.label(discogs_label_id).releases.page(i)
         label_results[i] = label
         
@@ -93,3 +95,9 @@ def get_release_id_from_labels(discogs_label_id):
             release_id_from_label.append(match.group().strip())
             
     return release_id_from_label
+
+def get_discogs_album_covers_from_label(discogs_label_id):
+    ids = get_release_id_from_labels(discogs_label_id)
+    # returns the images from the label discogs has a request limit of 60 per minute
+    for id in ids:
+        get_discogs_cover_image(id)
