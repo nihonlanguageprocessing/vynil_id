@@ -9,7 +9,7 @@ import re
 import discogs_client
 
 
-
+TEST
 
 DISCOGS_RELEASE_URL = 'https://api.discogs.com/releases/'
 # Enter your user token to get images
@@ -18,7 +18,7 @@ d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="")
 def get_discogs_cover_image(discogs_id):
     """Function returning the cover image of the album"""
     # Change the 0 to get other images associated with the album
-    
+
     #returns the images of albums that have an image associated with it
     if d.release(discogs_id).images is not None:
         cover = d.release(discogs_id).images[0]
@@ -30,7 +30,7 @@ def get_discogs_cover_image(discogs_id):
 def get_discogs_artist_name(discogs_id):
     """Function returning artist name for the album"""
     params = {'id':discogs_id}
-    
+
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
     artist_name = json_data['artists'][0]['name']
@@ -39,7 +39,7 @@ def get_discogs_artist_name(discogs_id):
 def get_discogs_album_name(discogs_id):
     """Function returning the name of the album"""
     params = {'id':discogs_id}
-    
+
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
     album_name = json_data['title']
@@ -48,7 +48,7 @@ def get_discogs_album_name(discogs_id):
 def get_discogs_url(discogs_id):
     """Function returning the url for the album"""
     params = {'id':discogs_id}
-    
+
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
     album_url = json_data['uri']
@@ -57,7 +57,7 @@ def get_discogs_url(discogs_id):
 def get_discogs_lowest_price(discogs_id):
     """Function returning the lowest price on discogs in $"""
     params = {'id':discogs_id}
-    
+
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
     lowest_price = json_data['lowest_price']
@@ -65,35 +65,35 @@ def get_discogs_lowest_price(discogs_id):
 
 def get_release_id_from_labels(discogs_label_id):
     """Function returning a list of album ids from a label"""
-    
+
     # Dictionary for all the records released by the label
-    
+
     page_number = len(d.label(discogs_label_id).releases)/50
-    
+
     label_results = {}
     for i in range(int(page_number)+2):
         label = d.label(discogs_label_id).releases.page(i)
         label_results[i] = label
-        
-    # List of lists of values from the dictionary    
+
+    # List of lists of values from the dictionary
     label_results_list = []
-    
+
     res_val = label_results.values()
     for value in res_val:
         str(value)
         label_results_list.append(value)
-    
+
     # Singular list of Release id and title
     fin_list = [l for sl in label_results_list for l in sl]
-    
+
     #list of release ids
     release_id_from_label = []
-    
+
     for i in fin_list:
         match = re.search( '\s+([^\s]+)' ,str(i))
         if match:
             release_id_from_label.append(match.group().strip())
-            
+
     return release_id_from_label
 
 def get_discogs_album_covers_from_label(discogs_label_id):
@@ -101,3 +101,5 @@ def get_discogs_album_covers_from_label(discogs_label_id):
     # returns the images from the label discogs has a request limit of 60 per minute
     for id in ids:
         get_discogs_cover_image(id)
+
+if __name__ == '__main__':
