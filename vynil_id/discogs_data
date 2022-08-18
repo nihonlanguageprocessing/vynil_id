@@ -13,7 +13,7 @@ import discogs_client
 
 DISCOGS_RELEASE_URL = 'https://api.discogs.com/releases/'
 # Enter your user token to get images
-d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="")
+d = discogs_client.Client('ExampleApplication/0.1' ,  user_token="puQrtnEjrKmMyUteBXrItifKdglTROLzMCGGfbem")
 
 def get_discogs_cover_image(discogs_id):
     """Function returning the cover image of the album"""
