@@ -4,7 +4,8 @@ from PIL import Image
 import pickle
 
 ##Turn that for filename in dir do function into function that accepts function and params as param
-PHASH_DESTINATION = 'vynil_id/data/phashs.json'
+PHASH_LOCATION = 'vynil_id/data/phashs.dat'
+DISCOGS_IMAGE_DIRECTORY = 'raw_data/discogs_images'
 
 def phash_collection(directory=False, candidates=False, **kwargs):
 
@@ -27,8 +28,13 @@ def phash_directory(directory):
             discogs_id = filename[:filename.index(".")]
             hash = phash(image)
             hashs[discogs_id] = hash
-    with open(PHASH_DESTINATION, 'wb') as f:
+    with open(PHASH_LOCATION, 'wb') as f:
         pickle.dump(hashs, f)
+
+def load_phash(directory):
+    with open(directory, 'rb') as filename:
+        hashs = pickle.load(filename)
+    return hashs
 
 def phash_candidates(candidates):
     hashs = []
@@ -42,5 +48,6 @@ def phash(image):
     return(hash)
 
 if __name__ == '__main__':
-    directory = 'raw_data/discogs_images'
-    phash_collection(directory=directory)
+    phash_collection(directory=DISCOGS_IMAGE_DIRECTORY)
+    hashs = load_phash(PHASH_LOCATION)
+    print(hashs)
