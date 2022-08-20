@@ -29,39 +29,31 @@ def get_discogs_cover_image(discogs_id):
         return cover_img
     pass
 
-def get_discogs_artist_name(discogs_id):
-    """Function returning artist name for the album"""
+def get_discogs_release_data(discogs_id):
+    """Get's release data in JSON form"""
     params = {'id':discogs_id}
 
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
+    return json_data
+
+def get_discogs_artist_name(json_data):
+    """Function returning artist name for the album"""
     artist_name = json_data['artists'][0]['name']
     return artist_name
 
-def get_discogs_album_name(discogs_id):
+def get_discogs_album_name(json_data):
     """Function returning the name of the album"""
-    params = {'id':discogs_id}
-
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
     album_name = json_data['title']
     return album_name
 
-def get_discogs_url(discogs_id):
+def get_discogs_url(json_data):
     """Function returning the url for the album"""
-    params = {'id':discogs_id}
-
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
     album_url = json_data['uri']
     return album_url
 
-def get_discogs_lowest_price(discogs_id):
+def get_discogs_lowest_price(json_data):
     """Function returning the lowest price on discogs in $"""
-    params = {'id':discogs_id}
-
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
     lowest_price = json_data['lowest_price']
     return lowest_price
 
@@ -98,8 +90,11 @@ def get_release_id_from_labels(discogs_label_id):
 
     return release_id_from_label
 
-def get_discogs_album_covers_from_label(discogs_label_id, save = False):
-    ids = get_release_id_from_labels(discogs_label_id)
+def get_discogs_album_covers(discogs_label_id = False, ids = False, save = False):
+    if discogs_label_id:
+        ids = get_release_id_from_labels(discogs_label_id)
+    elif ids == False:
+        return 'No lable or ID listed'
     # returns the images from the label discogs has a request limit of 60 per minute
 
     for id in ids:
@@ -107,7 +102,11 @@ def get_discogs_album_covers_from_label(discogs_label_id, save = False):
         print(image)
         if save == True and image:
             image.save('raw_data/discogs_images/'+ id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
-
+    pass
 
 if __name__ == '__main__':
-    get_discogs_album_covers_from_label(TEST_LABEL_ID, save=True)
+    # ids = get_release_id_from_labels(TEST_LABEL_ID)
+    with open('vynil_id/data/discogs_targets.txt') as f:
+        line = f.readline()
+        ids = line.split(',')
+    get_discogs_album_covers(discogs_label_id = False, ids = ids, save=True)
