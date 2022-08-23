@@ -106,12 +106,13 @@ def get_mercari_search_results(url=MERCARI_SEARCH_URL
                                , items=10
                                , save=False):
     """Uses the mercariAPI to get search results based on saved parameters"""
+    ### mercari.com entities::search
     json_params['pageSize'] = items
     response = requests.post(url=url, headers=headers, json=json_params)
     json_data = json.loads(response.text)['items']
 
     if save == True:
-        with open('vynil_id/config/mercari_search_results.json', 'w') as json_file:
+        with open('vynil_id/config/mercari_search_resultsANRI.json', 'w') as json_file:
             json.dump(json_data, json_file, indent=4, ensure_ascii=False)
 
     return json_data
@@ -127,7 +128,7 @@ def get_mercari_images(mercari_id):
 
 if __name__ == '__main__':
     ##Currently set to read results from file for testing
-    #json_data = get_mercari_search_results(MERCARI_SEARCH_URL, HEADERS, JSON_PARAMS)
-    with open('vynil_id/config/mercari_search_results.json', 'r') as json_file:
+    ##json_data = get_mercari_search_results(MERCARI_SEARCH_URL, HEADERS, JSON_PARAMS, items=50, save=True)
+    with open('vynil_id/data/mercari_search_resultsANRI.json', 'r') as json_file:
         json_data = json.load(json_file)
-    listings = get_mercari_listings(json_data, get_desc=True)
+    listings = get_mercari_listings(json_data)
