@@ -9,6 +9,7 @@ from io import BytesIO
 import re
 import discogs_client
 from os import makedirs
+import time
 
 
 TEST_LABEL_ID = '728017' ##acid wax
@@ -118,12 +119,12 @@ def get_discogs_album_covers(discogs_label_id = False, ids = False, save = False
     if discogs_label_id:
         ids = get_release_id_from_labels(discogs_label_id)
     elif ids == False:
-        return 'No lable or ID listed'
+        return 'No label or ID listed'
     # returns the images from the label discogs has a request limit of 60 per minute
 
     for id in ids:
+        time.sleep(5)
         image = get_discogs_cover_image(id)
-        print(image)
         if save == True and image:
             image.save('raw_data/discogs_images/'+ id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
     pass
