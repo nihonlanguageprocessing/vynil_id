@@ -16,6 +16,9 @@ def main(connect = False, verbose = False):
     # checking if it is a file
        if os.path.isfile(f):
            image = cv2.imread(f)
+    ## get all candidates
+    ## get phash of all candidates
+    ## compare to all pre calculated phashes
 
 if __name__ == '__main__':
     main(verbose=True)

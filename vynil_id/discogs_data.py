@@ -1,3 +1,4 @@
+from curses import raw
 import json
 from urllib import request, response
 from urllib.parse import parse_qsl
@@ -7,6 +8,8 @@ from PIL import Image
 from io import BytesIO
 import re
 import discogs_client
+from os import makedirs
+import time
 
 
 TEST_LABEL_ID = '728017' ##acid wax
@@ -29,39 +32,53 @@ def get_discogs_cover_image(discogs_id):
         return cover_img
     pass
 
-def get_discogs_artist_name(discogs_id):
-    """Function returning artist name for the album"""
+def get_discogs_release_data(discogs_id):
+    """Get's release data in JSON form"""
     params = {'id':discogs_id}
 
     response = requests.get(DISCOGS_RELEASE_URL+params['id'])
     json_data = response.json()
-    artist_name = json_data['artists'][0]['name']
-    return artist_name
+    return json_data
+
+def get_discogs_artist_name(discogs_id):
+    """Function returning the album name of the album"""
+    if d.release(discogs_id).artists[0].name is not None:
+        artist_name = d.release(discogs_id).artists[0].name
+        return artist_name
+    pass
+
 
 def get_discogs_album_name(discogs_id):
-    """Function returning the name of the album"""
-    params = {'id':discogs_id}
+    """Function returning the album name of the album"""
+    if d.release(discogs_id).title is not None:
+        album = d.release(discogs_id).title
+        return album
+    pass
 
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
-    album_name = json_data['title']
-    return album_name
+def get_discogs_album_names(discogs_label_id = False, ids = False, save = False):
+    if discogs_label_id:
+        ids = get_discogs_album_name(discogs_label_id)
+    elif ids == False:
+        return 'No Album or ID listed'
+    # returns the images from the label discogs has a request limit of 60 per minute
 
-def get_discogs_url(discogs_id):
+    for id in ids:
+        album_name = get_discogs_album_name(id)
+        print(album_name)
+    pass
+
+# def get_discogs_album_name(json_data):
+#     """Function returning the name of the album"""
+#     album_name = json_data['title']
+#     return album_name
+
+def get_discogs_url(json_data):
     """Function returning the url for the album"""
-    params = {'id':discogs_id}
-
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
     album_url = json_data['uri']
     return album_url
 
-def get_discogs_lowest_price(discogs_id):
+def get_discogs_lowest_price(json_data):
     """Function returning the lowest price on discogs in $"""
-    params = {'id':discogs_id}
-
-    response = requests.get(DISCOGS_RELEASE_URL+params['id'])
-    json_data = response.json()
     lowest_price = json_data['lowest_price']
     return lowest_price
 
@@ -98,16 +115,57 @@ def get_release_id_from_labels(discogs_label_id):
 
     return release_id_from_label
 
-def get_discogs_album_covers_from_label(discogs_label_id, save = False):
-    ids = get_release_id_from_labels(discogs_label_id)
+def get_discogs_album_covers(discogs_label_id = False, ids = False, save = False):
+    if discogs_label_id:
+        ids = get_release_id_from_labels(discogs_label_id)
+    elif ids == False:
+        return 'No label or ID listed'
+    # returns the images from the label discogs has a request limit of 60 per minute
+
+    for id in ids:
+        time.sleep(5)
+        image = get_discogs_cover_image(id)
+        if save == True and image:
+            image.save('raw_data/discogs_images/'+ id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
+    pass
+
+
+#class to get Album names and cover images
+def get_discogs_album_names_and_cover_images(discogs_label_id = False, ids = False, save = False):
+    if discogs_label_id:
+        ids = get_discogs_album_name(discogs_label_id)
+    elif ids == False:
+        return 'No Album or ID listed'
     # returns the images from the label discogs has a request limit of 60 per minute
 
     for id in ids:
         image = get_discogs_cover_image(id)
+        artist_name = get_discogs_artist_name(id)
+        album_name = get_discogs_album_name(id)
         print(image)
+        print(artist_name)
+        print(album_name)
         if save == True and image:
-            image.save('raw_data/discogs_images/'+ id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
+            raw_data = 'raw_data/discogs_images/'
+            album_name_path = raw_data+artist_name+' - '+album_name
+            # makedirs(album_name_path, exist_ok=True)
+            # image.save(album_name_path + '/' + artist_name + ' - ' + album_name + ' - ' + id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
+            image.save(artist_name + ' - ' + album_name + ' - ' + id + '.jpg', "JPEG", quality=80, optimize=True, progressive=True)
+    pass
 
 
+# if __name__ == '__main__':
+#     # ids = get_release_id_from_labels(TEST_LABEL_ID)
+#     with open('vynil_id/data/discogs_targets.txt') as f:
+#         line = f.readline()
+#         ids = line.split(',')
+#     get_discogs_album_covers(discogs_label_id = False, ids = ids, save=True)
+
+
+# Get Image inside the album name.
 if __name__ == '__main__':
-    get_discogs_album_covers_from_label(TEST_LABEL_ID, save=True)
+    # ids = get_release_id_from_labels(TEST_LABEL_ID)
+    with open('vynil_id/data/discogs_targets.txt') as f:
+        line = f.readline()
+        ids = line.split(',')
+    get_discogs_album_names_and_cover_images(discogs_label_id = False, ids = ids, save=True)
