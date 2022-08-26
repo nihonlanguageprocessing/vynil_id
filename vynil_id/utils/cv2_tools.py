@@ -20,11 +20,11 @@ def oct_contours(contours):
 
 def get_contours(image,min_size = 6000):
     '''return a list of all contours larger than min_size area'''
-    image = filter_(image)
-    image = clahe(image, 5, (3, 3))
+    image_filtered = filter_(image)
+    image_filtered = clahe(image_filtered, 5, (3, 3))
 
 
-    img_blur = cv2.blur(image, (10, 10))
+    img_blur = cv2.blur(image_filtered, (10, 10))
     img_th = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                cv2.THRESH_BINARY, 51, 2)
 
@@ -63,7 +63,7 @@ def squarish(contours):
 
     return squarish_contours
 
-def unwarp(image, contour):
+def unwarp(image, contour, verbose=False):
     '''unwarps an image based on quadrilateral contours'''
     h, w = image.shape[:2]
     # use cv2.getPerspectiveTransform() to get M, the transform matrix, and Minv, the inverse
@@ -82,10 +82,8 @@ def unwarp(image, contour):
     # use cv2.warpPerspective() to warp your image to a top-down view
     warped = cv2.warpPerspective(image, M, (w, h), flags=cv2.INTER_LINEAR)
     crop_warped = warped[0:size, 0:size].copy()
-    print(w-size)
-    print(w)
-    testing = True
-    if testing:
+    crop_warped = np.flip(crop_warped, axis=1)
+    if verbose:
         f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         f.subplots_adjust(hspace=.2, wspace=.05)
         ax1.imshow(image)
@@ -95,7 +93,7 @@ def unwarp(image, contour):
         ax2.set_title('Unwarped Image', fontsize=30)
         plt.show()
     else:
-        return warped, M
+        return crop_warped, M
 
 def filter(image):
     pass
@@ -103,13 +101,34 @@ def filter(image):
 
 def filter_(image):
     '''currently not using'''
-    ## should be refactored to take average colors from corner
-    ## or choose from a selection of colors
+    color = image[0][0]
     hsv = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2HSV)
-    lower_blue = np.array([0, 0, 120])
-    upper_blue = np.array([180, 38, 255])
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    lower = np.array([0, 0, 120])
+    upper = np.array([180, 38, 255])
+    #lower = color - 60
+    #upper = color + 60
+    print(lower)
+    print(upper)
+    mask = cv2.inRange(hsv, lower, upper)
     result = cv2.bitwise_and(image,image, mask=mask)
-    _, g, _ = cv2.split(result)
+    r, g, b = cv2.split(result)
+
+    f, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4, figsize=(20, 10))
+    f.subplots_adjust(hspace=.2, wspace=.05)
+    ax1.imshow(result)
+    ax2.imshow(r)
+    ax3.imshow(g)
+    ax4.imshow(b)
+
+    plt.show()
     g = clahe(g, 5, (3, 3))
     return g
+
+def resize_image(image):
+    width = 300
+    height = int(width / image.shape[1] *  image.shape[0])
+    dim = (width, height)
+
+    # resize image
+    resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+    return resized
