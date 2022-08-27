@@ -7,6 +7,7 @@ from utils.geo_tools import *
 from utils.cv2_tools import *
 import os
 import copy
+import itertools
 
 
 def get_quads(contours, method='oct'):
@@ -87,8 +88,16 @@ if __name__ == '__main__':
        f = os.path.join(directory, filename)
     # checking if it is a file
        if os.path.isfile(f):
-           image = cv2.imread(f)
-           image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-           image = resize_image(image)
-           threshold(image, verbose=False)
-           cv2.destroyAllWindows()
+            image = cv2.imread(f)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            #image = resize_image(image)
+            lines_h, lines_v = hough_lines_threshold(image)
+            lines_h_pairs = (itertools.combinations(lines_h, 2))
+            lines_v_pairs = (itertools.combinations(lines_v,2))
+            unsorted_quads = []
+            for line_h in lines_h_pairs:
+                for line_v in lines_v_pairs:
+                    unsorted_quad = pair_lines_to_quads(line_h, line_v)
+                    print(unsorted_quad)
+                    unsorted_quads.append(unsorted_quad)
+            cv2.destroyAllWindows()

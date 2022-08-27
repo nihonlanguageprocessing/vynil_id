@@ -99,7 +99,7 @@ def filter(image):
     pass
 
 
-def filter_(image):
+def filter_(image, verbose = False):
     '''currently not using'''
     color = image[0][0]
     hsv = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2HSV)
@@ -112,17 +112,60 @@ def filter_(image):
     mask = cv2.inRange(hsv, lower, upper)
     result = cv2.bitwise_and(image,image, mask=mask)
     r, g, b = cv2.split(result)
+    if verbose == True:
+        f, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4, figsize=(20, 10))
+        f.subplots_adjust(hspace=.2, wspace=.05)
+        ax1.imshow(result)
+        ax2.imshow(r)
+        ax3.imshow(g)
+        ax4.imshow(b)
+        plt.show()
 
-    f, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4, figsize=(20, 10))
-    f.subplots_adjust(hspace=.2, wspace=.05)
-    ax1.imshow(result)
-    ax2.imshow(r)
-    ax3.imshow(g)
-    ax4.imshow(b)
-
-    plt.show()
     g = clahe(g, 5, (3, 3))
     return g
+
+def hough_lines_threshold(image):
+    '''returns tuple of of vertical and horizontal lines'''
+    gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+
+    kernel_size = 5
+    blur_gray = cv2.GaussianBlur(gray,(kernel_size, kernel_size),0)
+    low_threshold = 50
+    high_threshold = 150
+
+    dst = cv2.Canny(blur_gray, low_threshold, high_threshold)
+
+    # Copy edges to the images that will display the results in BGR
+    cdst = cv2.cvtColor(dst, cv2.COLOR_GRAY2BGR)
+
+    lines = cv2.HoughLines(dst, 1, np.pi / 180, 150, None, 80, 30)
+    lines_v = []
+    lines_h = []
+    if lines is not None:
+        for i in range(0, len(lines)):
+
+            rho = lines[i][0][0]
+            theta = lines[i][0][1]
+            degrees_ = math.degrees(theta)
+            if (0 <= degrees_ % 180 <= 10) or (170 <= degrees_ % 180 <= 180):
+                pts = ro_to_ab(rho,theta)
+                lines_h.append(pts)
+                cv2.line(cdst, pts[0], pts[1], (255,0,0), 3, cv2.LINE_AA)
+            elif (80 <= degrees_ % 180 <= 100):
+                pts = ro_to_ab(rho,theta)
+                lines_v.append(pts)
+                cv2.line(cdst, pts[0], pts[1], (0,0,255), 3, cv2.LINE_AA)
+    ## categorize each line as vertical or horizontal, discard lines greater than 20* off
+    ## find all quadrilaterals from each intersection of pairs
+    ## discard small quads, discard not square quads
+
+    cv2.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst)
+ #   cv2.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP)
+
+    cv2.waitKey(5000)
+
+    return [lines_h, lines_v]
+
 
 def resize_image(image):
     width = 300
