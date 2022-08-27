@@ -128,7 +128,7 @@ def get_mercari_images(mercari_id):
 
 if __name__ == '__main__':
     ##Currently set to read results from file for testing
-    ##json_data = get_mercari_search_results(MERCARI_SEARCH_URL, HEADERS, JSON_PARAMS, items=50, save=True)
-    with open('vynil_id/data/mercari_search_resultsANRI.json', 'r') as json_file:
+    #json_data = get_mercari_search_results(MERCARI_SEARCH_URL, HEADERS, JSON_PARAMS, items=50, save=True)
+    with open('vynil_id/config/mercari_search_resultsUTADA.json', 'r') as json_file:
         json_data = json.load(json_file)
     listings = get_mercari_listings(json_data)

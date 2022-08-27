@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from vynil_id.utils import vector_tools
+import math
 
 def max_directional_oct(contour):
     '''From a contours, finds maxiumum points in each of 8 directions'''
@@ -86,3 +87,30 @@ def longest_line_intersections(points, indices_pairs):
     ## Convert to contour
     ngon = np.stack(ngon_points, axis=0).reshape((-1,1,2)).astype(np.int32)
     return ngon
+
+def ro_to_ab(rho, theta):
+    '''converts a line from rho theta to a tuple of points'''
+    a = math.cos(theta)
+    b = math.sin(theta)
+    x0 = a * rho
+    y0 = b * rho
+    pt1 = (int(x0 + 1000*(-b)), int(y0 + 1000*(a)))
+    pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
+    return (pt1,pt2)
+
+def pair_lines_to_quads(line_h, line_v):
+    '''converts two pairs of lines (defined by two points each)
+    to a simple quad of 4 points'''
+    line_h0 = line_h[0]
+    line_h1 = line_h[1]
+    line_v0 = line_v[0]
+    line_v1 = line_v[1]
+    point_h0_v0 = vector_tools.seg_intersect(np.array(line_h0[0]), np.array(line_h0[1]), np.array(line_v0[0]), np.array(line_v0[1]))
+    point_h0_v1 = vector_tools.seg_intersect(np.array(line_h0[0]), np.array(line_h0[1]), np.array(line_v1[0]), np.array(line_v1[1]))
+    point_h1_v0 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v0[0]), np.array(line_v0[1]))
+    point_h1_v1 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v1[0]), np.array(line_v1[1]))
+    return (point_h0_v0, point_h0_v1, point_h1_v0, point_h1_v1)
+
+def orient_quad_arbitrary():
+    '''returns a oriented quad from a tuple of 4 points that aren't sorted'''
+    pass
