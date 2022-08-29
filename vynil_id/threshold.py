@@ -9,6 +9,7 @@ import os
 import copy
 import itertools
 
+MERCARI_IMAGES = 'raw_data/mercari_images'
 
 def get_quads(contours, method='oct'):
     quads = []
@@ -83,8 +84,8 @@ def threshold(image, verbose = False, show_candidates = False):
     pass
 
 if __name__ == '__main__':
-    directory = 'raw_data/mercari_images'
-    for filename in os.listdir(directory):
+
+    for filename in os.listdir(MERCARI_IMAGES):
        f = os.path.join(directory, filename)
     # checking if it is a file
        if os.path.isfile(f):

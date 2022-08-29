@@ -109,8 +109,17 @@ def pair_lines_to_quads(line_h, line_v):
     point_h0_v1 = vector_tools.seg_intersect(np.array(line_h0[0]), np.array(line_h0[1]), np.array(line_v1[0]), np.array(line_v1[1]))
     point_h1_v0 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v0[0]), np.array(line_v0[1]))
     point_h1_v1 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v1[0]), np.array(line_v1[1]))
-    return (point_h0_v0, point_h0_v1, point_h1_v0, point_h1_v1)
+    quad_arbitrary_points = [point_h0_v0, point_h0_v1, point_h1_v0, point_h1_v1]
+    quad_arbitrary = np.stack(quad_arbitrary_points, axis=0).reshape((-1,1,2)).astype(np.int32)
+    print(quad_arbitrary)
+    return quad_arbitrary
 
-def orient_quad_arbitrary():
-    '''returns a oriented quad from a tuple of 4 points that aren't sorted'''
+def orient_quad_arbitrary(quad):
+    '''returns a 4-point quadrilateral with the 0th index being the top left item
+    The quad does not need to be sorted beforehand'''
+    x, y = np.split(quad,2,axis=1)
+
+    top_2_x_index = np.argsort(x,axis=0)[-2:]
+    top_y_index = int(top_2_x_index[np.argmin(y[top_2_x_index])])
+    oriented_quad = np.concatenate((quad[top_y_index:],quad[:top_y_index]), axis=0)
     pass
