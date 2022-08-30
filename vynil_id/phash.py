@@ -91,12 +91,17 @@ if __name__ == '__main__':
             files.append(file)
 
     preds = []
+    files = files[:10]
+    len(file)
     correct_num = 0
     for file in files:
         f = os.path.join(MERCARI_IMAGE_DIRECTORY, file)
         if os.path.isfile(f):
-            image = Image.open(f)
-            candidates = [image]
+            image = cv2.imread(f) ##image = Image.open(f)
+
+            candidates = threshold.messy_threshold(image)
+
+            candidates_pil = [Image.fromarray(cv2.cvtColor(candidate, cv2.COLOR_BGR2RGB)) for candidate in candidates]
             prediction = get_prediction(candidates, library_hashs)
             preds.append((file,prediction))
 

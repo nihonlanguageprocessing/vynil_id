@@ -98,7 +98,7 @@ def ro_to_ab(rho, theta):
     pt2 = (int(x0 - 1000*(-b)), int(y0 - 1000*(a)))
     return (pt1,pt2)
 
-def pair_lines_to_quads(line_h, line_v):
+def pair_lines_to_quads(line_h, line_v, round_yn = True ):
     '''converts two pairs of lines (defined by two points each)
     to a simple quad of 4 points'''
     line_h0 = line_h[0]
@@ -110,16 +110,42 @@ def pair_lines_to_quads(line_h, line_v):
     point_h1_v0 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v0[0]), np.array(line_v0[1]))
     point_h1_v1 = vector_tools.seg_intersect(np.array(line_h1[0]), np.array(line_h1[1]), np.array(line_v1[0]), np.array(line_v1[1]))
     quad_arbitrary_points = [point_h0_v0, point_h0_v1, point_h1_v0, point_h1_v1]
-    quad_arbitrary = np.stack(quad_arbitrary_points, axis=0).reshape((-1,1,2)).astype(np.int32)
-    print(quad_arbitrary)
+    if round_yn == True:
+        quad_arbitrary = np.stack(quad_arbitrary_points, axis=0).reshape((-1,1,2)).astype(np.int32)
+    else:
+        quad_arbitrary = np.stack(quad_arbitrary_points, axis=0).reshape((-1,1,2))
     return quad_arbitrary
 
 def orient_quad_arbitrary(quad):
     '''returns a 4-point quadrilateral with the 0th index being the top left item
+    sorted clockwise
     The quad does not need to be sorted beforehand'''
-    x, y = np.split(quad,2,axis=1)
+    center = [0,0]
+    for point in quad:
+        center+= point[0]
+    center = center / 4
 
-    top_2_x_index = np.argsort(x,axis=0)[-2:]
-    top_y_index = int(top_2_x_index[np.argmin(y[top_2_x_index])])
-    oriented_quad = np.concatenate((quad[top_y_index:],quad[:top_y_index]), axis=0)
-    pass
+    oriented_quad_pts = [[-1,-1]] * 4
+    for point in quad:
+        dx, dy = point[0] - center
+        if dx < 0:
+            if dy > 0:
+                oriented_quad_pts[0] = point[0] #top_left
+            else:
+                oriented_quad_pts[3] = point[0] #bottom_left
+        else:
+            if dy > 0:
+                oriented_quad_pts[1] = point[0] #top_right
+            else:
+                oriented_quad_pts[2] = point[0] #bottom_right
+    #print('QUAD')
+    #print(quad)
+    #print('CENTER')
+    #print(center)
+    #print('ORIENTED')
+    #print(oriented_quad_pts)
+    if oriented_quad_pts[0][0] == -1 or oriented_quad_pts[1][0] == -1:
+        pass
+    else:
+        oriented_quad = np.stack(oriented_quad_pts, axis=0).reshape((-1,1,2)).astype(np.int32)
+        return oriented_quad

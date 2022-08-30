@@ -16,4 +16,9 @@ def seg_intersect(a1,a2, b1,b2) :
     dap = perp(da)
     denom = np.dot( dap, db)
     num = np.dot( dap, dp )
-    return (num / denom.astype(float))*db + b1
+    intersect = (num / denom.astype(float))*db + b1
+    return intersect
+
+if __name__ == '__main__':
+    arr = np.array(([0,0],[5,0],[6,0],[6,1]))
+    print(seg_intersect(arr[0],arr[1],arr[2],arr[3]))

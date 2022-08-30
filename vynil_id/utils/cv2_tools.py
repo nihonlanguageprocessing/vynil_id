@@ -36,6 +36,10 @@ def get_contours(image,min_size = 6000):
     contours = [contour for contour in contours if cv2.contourArea(contour) >= min_size]
     return contours
 
+def reduce_small_contours(contours, min_size = 6000):
+    contours = [contour for contour in contours if cv2.contourArea(contour) >= min_size]
+    return contours
+
 def get_hulls(contours):
     '''return a list of convex hulls for each contour'''
     hulls = []
@@ -82,7 +86,7 @@ def unwarp(image, contour, verbose=False):
     # use cv2.warpPerspective() to warp your image to a top-down view
     warped = cv2.warpPerspective(image, M, (w, h), flags=cv2.INTER_LINEAR)
     crop_warped = warped[0:size, 0:size].copy()
-    crop_warped = np.flip(crop_warped, axis=1)
+    crop_warped = np.rot90(crop_warped, k=1, axes=(0,1))
     if verbose:
         f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         f.subplots_adjust(hspace=.2, wspace=.05)
@@ -92,8 +96,7 @@ def unwarp(image, contour, verbose=False):
         ax2.imshow(cv2.flip(crop_warped, 1))
         ax2.set_title('Unwarped Image', fontsize=30)
         plt.show()
-    else:
-        return crop_warped, M
+    return crop_warped
 
 def filter(image):
     pass
@@ -124,7 +127,7 @@ def filter_(image, verbose = False):
     g = clahe(g, 5, (3, 3))
     return g
 
-def hough_lines_threshold(image):
+def hough_lines_threshold(image, verbose = False):
     '''returns tuple of of vertical and horizontal lines'''
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
 
@@ -138,7 +141,7 @@ def hough_lines_threshold(image):
     # Copy edges to the images that will display the results in BGR
     cdst = cv2.cvtColor(dst, cv2.COLOR_GRAY2BGR)
 
-    lines = cv2.HoughLines(dst, 1, np.pi / 180, 150, None, 80, 30)
+    lines = cv2.HoughLines(dst, 1, np.pi / 180, 165, None, 80, 30)
     lines_v = []
     lines_h = []
     if lines is not None:
@@ -150,19 +153,20 @@ def hough_lines_threshold(image):
             if (0 <= degrees_ % 180 <= 10) or (170 <= degrees_ % 180 <= 180):
                 pts = ro_to_ab(rho,theta)
                 lines_h.append(pts)
-                cv2.line(cdst, pts[0], pts[1], (255,0,0), 3, cv2.LINE_AA)
+                if verbose == True:
+                    cv2.line(cdst, pts[0], pts[1], (255,0,0), 3, cv2.LINE_AA)
             elif (80 <= degrees_ % 180 <= 100):
                 pts = ro_to_ab(rho,theta)
                 lines_v.append(pts)
-                cv2.line(cdst, pts[0], pts[1], (0,0,255), 3, cv2.LINE_AA)
+                if verbose == True:
+                    cv2.line(cdst, pts[0], pts[1], (0,0,255), 3, cv2.LINE_AA)
     ## categorize each line as vertical or horizontal, discard lines greater than 20* off
     ## find all quadrilaterals from each intersection of pairs
     ## discard small quads, discard not square quads
 
-    cv2.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst)
- #   cv2.imshow("Detected Lines (in red) - Probabilistic Line Transform", cdstP)
-
-    cv2.waitKey(5000)
+    if verbose == True:
+        cv2.imshow("Detected Lines (in red) - Standard Hough Line Transform", cdst)
+        cv2.waitKey(5000)
 
     return [lines_h, lines_v]
 
