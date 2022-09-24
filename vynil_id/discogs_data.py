@@ -139,12 +139,15 @@ def get_discogs_album_names_and_cover_images(discogs_label_id = False, ids = Fal
     # returns the images from the label discogs has a request limit of 60 per minute
 
     for id in ids:
-        image = get_discogs_cover_image(id)
+        time.sleep(5)
+        #image = get_discogs_cover_image(id)
         artist_name = get_discogs_artist_name(id)
         album_name = get_discogs_album_name(id)
-        print(image)
-        print(artist_name)
-        print(album_name)
+        #print(image)
+        #print(artist_name)
+        #print(album_name)
+        album_name_path = artist_name+' - '+album_name
+        print(f'{id}, {album_name_path}')
         if save == True and image:
             raw_data = 'raw_data/discogs_images/'
             album_name_path = raw_data+artist_name+' - '+album_name
@@ -168,4 +171,4 @@ if __name__ == '__main__':
     with open('vynil_id/data/discogs_targets.txt') as f:
         line = f.readline()
         ids = line.split(',')
-    get_discogs_album_names_and_cover_images(discogs_label_id = False, ids = ids, save=True)
+    get_discogs_album_names_and_cover_images(discogs_label_id = False, ids = ids, save=False)

@@ -9,6 +9,7 @@ from utils.cv2_tools import *
 import os
 import copy
 import itertools
+import random
 
 MERCARI_IMAGES = 'raw_data/mercari_images'
 
@@ -87,8 +88,12 @@ def messy_threshold(image, verbose=False):
     '''a currently very messy function'''
        #image = resize_image(image)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    lines_h, lines_v = hough_lines_threshold(image, verbose=verbose)
+    lines_h, lines_v = hough_lines_threshold(image, verbose=True)
     image_size = image.shape
+    if len(lines_h) >20:
+        lines_h = random.sample(lines_h,20)
+    if len(lines_v) >20:
+        lines_v = random.sample(lines_v,20)
     lines_h.append(((0,0),(1,0)))
     lines_h.append(((0,0),(0,1)))
     lines_h.append(((image_size[0],image_size[1]), (image_size[0],0)))
@@ -114,15 +119,16 @@ def messy_threshold(image, verbose=False):
     reduced_contours = reduce_small_contours(oriented_quads, min_size=min_area)
     #cv2.drawContours(image,reduced_contours,-1,(255,0,255),4)
     contours = squarish(reduced_contours)
+    print(f'H Lines: {len(lines_h)}, V Lines: {len(lines_v)}')
     print(f'Line Pairs: {i}, Unsorted: {len(unsorted_quads)}, Oriented: {len(oriented_quads)}, Reduced: {len(reduced_contours)}, Big: {len(reduced_contours)}, Square: {len(contours)}')
-    i = 0
     l10 = math.ceil(len(contours) / 10)
 
     largest_contours = sorted(contours, key=cv2.contourArea)[-(l10+3):]
     if verbose == True:
-        cv2.drawContours(image,largest_contours,-1,(0,0,i),5)
+        image_c = image.copy()
+        cv2.drawContours(image_c,largest_contours,-1,(255,0,255),5)
         plt.figure(figsize=(8,8))
-        plt.imshow(image)
+        plt.imshow(image_c)
         plt.show()
         cv2.destroyAllWindows()
 

@@ -9,8 +9,11 @@ import threshold
 import cv2
 import numpy as np
 import pandas as pd
+import time
+import random
 
 ##Turn that for filename in dir do function into function that accepts function and params as param
+PHASH_LOCATION = 'vynil_id/data/phashs_cr.dat'
 PHASH_LOCATION = 'vynil_id/data/phashs.dat'
 DISCOGS_IMAGE_DIRECTORY = 'raw_data/discogs_images'
 MERCARI_IMAGE_DIRECTORY = 'raw_data/mercari_images'
@@ -25,8 +28,6 @@ def phash_collection(directory=False, candidates=False, **kwargs):
         phash(candidates)
     pass
 
-def read_phash(location):
-    pass
 
 def phash_directory(directory):
     hashs = {}
@@ -61,22 +62,34 @@ def check_against_library(candidate_hashs, library_hashs):
             distances.append((distance, discogs_id))
     return distances
 
-def get_prediction(candidates, library_hashs):
+def get_prediction(candidates, library_hashs, save = False):
+    distance = 0
     distances = check_against_library(phash_candidates(candidates), library_hashs)
     #print(distances)
     distance, discogs_id = zip(*distances)
     idx = np.argmin(distance)
     prediction = discogs_id[idx]
-    print(prediction)
-    return prediction
 
-def phash(image):
-    hash = imagehash.average_hash(image)
+
+    #for i, candidate in enumerate(candidates):
+
+     #   candidate.save(str(i) + '_' + str(discogs_id[i]) + ' ' + str(distance[i])+'.jpg')
+    return (prediction, distance[idx])
+
+def phash(image, augment=False):
+    if augment == True:
+        img_width, img_height = image.size
+        half_width = int(img_width/2)
+        image = image.crop((half_width,0,img_width,img_height))
+        hash = imagehash.average_hash(image)
+    else:
+        hash = imagehash.average_hash(image)
     return(hash)
 
 if __name__ == '__main__':
     phash_collection(directory=DISCOGS_IMAGE_DIRECTORY)
     library_hashs = load_phash(PHASH_LOCATION)
+    print(type(library_hashs))
 
     i = 0
     annotated_mercari_df = pd.read_csv(MERCARI_ANNOTATED, sep=',')
@@ -89,26 +102,41 @@ if __name__ == '__main__':
     for file in os.listdir(MERCARI_IMAGE_DIRECTORY):
         if file in records.index.values:
             files.append(file)
+    files = ['m41041869320.jpg','m52637126854.jpg','m62966640085.jpg','m93923434809.jpg','m95839112261.jpg']
 
     preds = []
-    files = files[:10]
-    len(file)
+   # files = files[:10]
+    print(len(files))
     correct_num = 0
+    i = 0
     for file in files:
+        #file = 'm38189604327.jpg'
         f = os.path.join(MERCARI_IMAGE_DIRECTORY, file)
+
         if os.path.isfile(f):
+            print(f)
             image = cv2.imread(f) ##image = Image.open(f)
 
-            candidates = threshold.messy_threshold(image)
+            candidates = threshold.messy_threshold(image, verbose=True)
+            if len(candidates) > 500:
+                candidates = random.sample(candidates,500)
 
-            candidates_pil = [Image.fromarray(cv2.cvtColor(candidate, cv2.COLOR_BGR2RGB)) for candidate in candidates]
-            prediction = get_prediction(candidates, library_hashs)
-            preds.append((file,prediction))
+            candidates_pil = [Image.fromarray(candidate) for candidate in candidates]
+            image_pil = Image.open(f)
+            candidates_pil.append(image_pil)
+            prediction, distance = get_prediction(candidates_pil, library_hashs)
+            preds.append((file,prediction, distance))
 
-    preds_df = pd.DataFrame(preds, columns=['file_name','prediction_id']).set_index('file_name')
-    preds_df['prediction_id'] = preds_df.astype({'prediction_id':'int64'})
+            print(i)
+            i+=1
+    print('hello')
+    print(preds)
+    preds_df = pd.DataFrame(preds, columns=['file_name','prediction_id', 'distance']).set_index('file_name')
+    print(preds_df.shape)
+    preds_df['prediction_id'] = preds_df['prediction_id'].astype({'prediction_id':'int64'})
     records = records.join(preds_df, how='left')
 
     records['correct'] = np.where(records['discogs_id'] == records['prediction_id'], True, False)
     print(records['correct'].value_counts())
-    records.to_csv('vynil_id/data/phash_classification.csv')
+    print('hello')
+    records.to_csv('vynil_id/data/phash_classification_r.csv')
