@@ -1,5 +1,6 @@
 import cv2
 import os
+import time
 
 MERCARI_IMAGES = 'raw_data/mercari_images'
 
@@ -19,17 +20,27 @@ class Annotater(object):
         # Record starting (x,y) coordinates on left mouse button click
         if event == cv2.EVENT_LBUTTONDOWN:
             self.image_coordinates.append((x,y))
-            print(self.image_coordinates)
+            #print(self.image_coordinates)
 
         # Clear drawing boxes on right mouse button click
         elif event == cv2.EVENT_RBUTTONDOWN:
             self.clone = self.original_image.copy()
+
+    def draw_quads(self):
+        if len(self.image_coordates) > 4:
+             self.image_coordinates = self.reduce_polygon_to_q()
+        ##draw hull on image and show
+
+    def reduce_polygon_to_q(self):
+
+
 
     def get_coords(self):
         return self.image_coordinates
 
     def show_image(self):
         return self.clone
+
 
 
 if __name__ == '__main__':
@@ -45,7 +56,10 @@ if __name__ == '__main__':
         # Close program with keyboard 'q'
             print(f'{key}, {key_}')
             if key_ == ord('q') and key_ != key:
-                annotater_widget.get_coords()
+                annotater_widget.draw_quad()
+                coords = annotater_widget.get_coords()
+                print(coords)
+                time.sleep(2)
                 cv2.destroyAllWindows()
                 break
 

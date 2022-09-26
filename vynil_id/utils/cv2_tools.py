@@ -180,3 +180,12 @@ def resize_image(image):
     # resize image
     resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
     return resized
+
+def contour_to_quad(contour):
+    '''Turns a polygonal contour (n>4) into a quad  by taking the quad
+    formed from the 4 longest sides of the polygonal contour.
+    Returns a contour'''
+    dists = point_distances(contour)
+    indices_pairs = longest_line_indices(dists)
+    quad = longest_line_intersections(contour, indices_pairs)
+    return quad
