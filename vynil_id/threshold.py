@@ -18,9 +18,7 @@ def get_quads(contours, method='oct'):
     if method == 'oct':
         for contour in contours:
             oct_points = max_directional_oct(contour)
-            dists = point_distances(oct_points)
-            indices_pairs = longest_line_indices(dists)
-            quad = longest_line_intersections(oct_points, indices_pairs)
+            quad = contour_to_quad(oct_points)
             quads.append(quad)
     elif method == 'red':
         eps = 0.010
@@ -28,9 +26,7 @@ def get_quads(contours, method='oct'):
         for contour in contours:
             peri = cv2.arcLength(contour, True)
             reduced_contour = cv2.approxPolyDP(contour, eps * peri, True)
-            dists = point_distances(reduced_contour)
-            indices_pairs = longest_line_indices(dists)
-            quad = longest_line_intersections(reduced_contour, indices_pairs)
+            quad = contour_to_quad(reduced_contour)
             quads.append(quad)
     return quads
 
@@ -47,9 +43,8 @@ def threshold(image, verbose = False, show_candidates = False):
         peri = cv2.arcLength(contour, True)
         reduced_contour = cv2.approxPolyDP(contour, eps * peri, True)
 
-        dists = point_distances(reduced_contour)
-        indices_pairs = longest_line_indices(dists)
-        quad_ = longest_line_intersections(reduced_contour, indices_pairs)
+
+        quad_ = contour_to_quad(reduced_contour)
         quad_ = cv2.approxPolyDP(quad_, 0.010, closed=True)
         reduced_contours.append(quad_)
 
