@@ -1,6 +1,8 @@
 import cv2
 import os
 import time
+import cv2_tools
+import numpy as np
 
 MERCARI_IMAGES = 'raw_data/mercari_images'
 
@@ -26,13 +28,22 @@ class Annotater(object):
         elif event == cv2.EVENT_RBUTTONDOWN:
             self.clone = self.original_image.copy()
 
-    def draw_quads(self):
-        if len(self.image_coordates) > 4:
+    def draw_quad(self):
+        if len(self.image_coordinates) > 4:
+             self.image_coordinates = np.stack(self.image_coordinates, axis=0).reshape((-1,1,2)).astype(np.int32)
              self.image_coordinates = self.reduce_polygon_to_q()
         ##draw hull on image and show
+        else:
+            self.image_coordinates = np.stack(self.image_coordinates, axis=0).reshape((-1,1,2)).astype(np.int32)
+
+        cv2.drawContours(self.clone, [self.image_coordinates], 0, (0,255,0), 3)
+        cv2.imshow("image", self.clone)
+        cv2.waitKey(2000)
+        pass
 
     def reduce_polygon_to_q(self):
-
+        print('hello :)')
+        return cv2_tools.contour_to_quad(self.image_coordinates)
 
 
     def get_coords(self):
@@ -57,9 +68,10 @@ if __name__ == '__main__':
             print(f'{key}, {key_}')
             if key_ == ord('q') and key_ != key:
                 annotater_widget.draw_quad()
+                cv2.waitKey(2000)
                 coords = annotater_widget.get_coords()
                 print(coords)
-                time.sleep(2)
+                #time.sleep(2)
                 cv2.destroyAllWindows()
                 break
 
