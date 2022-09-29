@@ -3,8 +3,16 @@ import os
 import time
 import cv2_tools
 import numpy as np
+import json
 
 MERCARI_IMAGES = 'raw_data/mercari_images'
+
+#TO DO
+# Save to file
+# Only open non annotated files
+# Double click clear all
+# Single rclick clear last drawn
+
 
 class Annotater(object):
     def __init__(self, image_path):
@@ -16,35 +24,41 @@ class Annotater(object):
         cv2.setMouseCallback('image', self.extract_coordinates)
 
         # Bounding box reference points
-        self.image_coordinates = []
+        self.image_coordinates = [[]]
 
     def extract_coordinates(self, event, x, y, flags, parameters):
         # Record starting (x,y) coordinates on left mouse button click
         if event == cv2.EVENT_LBUTTONDOWN:
-            self.image_coordinates.append((x,y))
-            #print(self.image_coordinates)
+            cv2.circle(self.clone,(x,y),2,(0,0,255),-1)
+            self.image_coordinates[-1].append((x,y))
+            cv2.imshow("image",self.clone)
 
-        # Clear drawing boxes on right mouse button click
+
+        elif event == cv2.EVENT_MBUTTONDOWN:
+            self.draw_quad()
+            self.image_coordinates.append([])
+
+        # Clear last drawn quad on right mouse button click
         elif event == cv2.EVENT_RBUTTONDOWN:
             self.clone = self.original_image.copy()
+            cv2.imshow("image",self.clone)
 
-    def draw_quad(self):
-        if len(self.image_coordinates) > 4:
-             self.image_coordinates = np.stack(self.image_coordinates, axis=0).reshape((-1,1,2)).astype(np.int32)
-             self.image_coordinates = self.reduce_polygon_to_q()
+        clear
+
+    def draw_quad(self, internal = True):
+        self.image_coordinates[-1] = np.stack(self.image_coordinates[-1], axis=0).reshape((-1,1,2)).astype(np.int32)
+        if len(self.image_coordinates[-1]) > 4:
+            self.image_coordinates[-1] = self.reduce_polygon_to_q()
         ##draw hull on image and show
-        else:
-            self.image_coordinates = np.stack(self.image_coordinates, axis=0).reshape((-1,1,2)).astype(np.int32)
 
-        cv2.drawContours(self.clone, [self.image_coordinates], 0, (0,255,0), 3)
+        cv2.drawContours(self.clone, [self.image_coordinates[-1]], 0, (0,255,0), 3)
         cv2.imshow("image", self.clone)
-        cv2.waitKey(2000)
+        if internal == False:
+            cv2.waitKey(2000)
         pass
 
     def reduce_polygon_to_q(self):
-        print('hello :)')
-        return cv2_tools.contour_to_quad(self.image_coordinates)
-
+        return cv2_tools.contour_to_quad(self.image_coordinates[-1])
 
     def get_coords(self):
         return self.image_coordinates
@@ -52,13 +66,16 @@ class Annotater(object):
     def show_image(self):
         return self.clone
 
-
+def save_json(location: str, annotations: dict):
+    json.dump(annotations, location, sort_keys=True, indent=4)
 
 if __name__ == '__main__':
 
 
     for filename in os.listdir(MERCARI_IMAGES):
+
         f = os.path.join(MERCARI_IMAGES, filename)
+        anno_dict= {}
         annotater_widget = Annotater(f)
         key = 113
         while True:
@@ -67,11 +84,9 @@ if __name__ == '__main__':
         # Close program with keyboard 'q'
             print(f'{key}, {key_}')
             if key_ == ord('q') and key_ != key:
-                annotater_widget.draw_quad()
-                cv2.waitKey(2000)
+                annotater_widget.draw_quad(internal=False)
                 coords = annotater_widget.get_coords()
                 print(coords)
-                #time.sleep(2)
                 cv2.destroyAllWindows()
                 break
 
