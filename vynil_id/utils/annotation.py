@@ -111,7 +111,7 @@ def get_json(json_file_path: str) -> json:
 def update_json(json_file_path: str, old_coords: json) -> None:
     with open(JSON_FILE, 'w') as json_file:
 
-        json.dump(data, json_file, sort_keys=True, indent=2)
+        json.dump(old_coords, json_file, sort_keys=True, indent=2)
     #https://stackoverflow.com/questions/13249415/how-to-implement-custom-indentation-when-pretty-printing-with-the-json-module
 
 
@@ -128,12 +128,12 @@ if __name__ == '__main__':
         while True:
             cv2.imshow('image', annotater_widget.get_image())
             key_ = cv2.waitKey(0)
-
              # Close program with keyboard 'q'
             if key_ == ord('q') and key_ != key:
 
                 coords = annotater_widget.get_coords()
-                data.update({filenames[i], coords})
+                #print(annotater_widget.image_coordinates)
+                data.update({filenames[i]: coords})
                 update_json(JSON_FILE, data)
 
 
